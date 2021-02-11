@@ -46,31 +46,16 @@ public class RecipeCommandToRecipe implements Converter<RecipeCommand, Recipe> {
         recipe.setUrl(source.getUrl());
         recipe.setNotes(notesConverter.convert(source.getNotes()));
 
-        if (nonNull(source.getCategories())) {
+        if (source.getCategories() != null && source.getCategories().size() > 0){
             source.getCategories()
-                    .stream()
-                    .map(categoryConveter::convert)
-                    .forEach(recipe.getCategories()::add);
+                    .forEach( category -> recipe.getCategories().add(categoryConveter.convert(category)));
         }
 
-        if (nonNull(source.getIngredients())) {
+        if (source.getIngredients() != null && source.getIngredients().size() > 0){
             source.getIngredients()
-                    .stream()
-                    .map(ingredientConverter::convert)
-                    .forEach(recipe.getIngredients()::add);
+                    .forEach(ingredient -> recipe.getIngredients().add(ingredientConverter.convert(ingredient)));
         }
 
         return recipe;
-//        if (source.getCategories() != null && source.getCategories().size() > 0){
-//            source.getCategories()
-//                    .forEach( category -> recipe.getCategories().add(categoryConveter.convert(category)));
-//        }
-//
-//        if (source.getIngredients() != null && source.getIngredients().size() > 0){
-//            source.getIngredients()
-//                    .forEach(ingredient -> recipe.getIngredients().add(ingredientConverter.convert(ingredient)));
-//        }
-//
-//        return recipe;
     }
 }
