@@ -7,6 +7,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.nonNull;
+
 /**
  * Created by jt on 6/21/17.
  */
@@ -44,16 +46,31 @@ public class RecipeCommandToRecipe implements Converter<RecipeCommand, Recipe> {
         recipe.setUrl(source.getUrl());
         recipe.setNotes(notesConverter.convert(source.getNotes()));
 
-        if (source.getCategories() != null && source.getCategories().size() > 0){
+        if (nonNull(source.getCategories())) {
             source.getCategories()
-                    .forEach( category -> recipe.getCategories().add(categoryConveter.convert(category)));
+                    .stream()
+                    .map(categoryConveter::convert)
+                    .forEach(recipe.getCategories()::add);
         }
 
-        if (source.getIngredients() != null && source.getIngredients().size() > 0){
+        if (nonNull(source.getIngredients())) {
             source.getIngredients()
-                    .forEach(ingredient -> recipe.getIngredients().add(ingredientConverter.convert(ingredient)));
+                    .stream()
+                    .map(ingredientConverter::convert)
+                    .forEach(recipe.getIngredients()::add);
         }
 
         return recipe;
+//        if (source.getCategories() != null && source.getCategories().size() > 0){
+//            source.getCategories()
+//                    .forEach( category -> recipe.getCategories().add(categoryConveter.convert(category)));
+//        }
+//
+//        if (source.getIngredients() != null && source.getIngredients().size() > 0){
+//            source.getIngredients()
+//                    .forEach(ingredient -> recipe.getIngredients().add(ingredientConverter.convert(ingredient)));
+//        }
+//
+//        return recipe;
     }
 }
