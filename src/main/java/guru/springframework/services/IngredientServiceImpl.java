@@ -87,7 +87,7 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public Mono<IngredientCommand> saveIngredientCommand(IngredientCommand command) {
-        Recipe recipe = recipeReactiveRepository.findById(command.getRecipeId()).block();
+        Recipe recipe = recipeReactiveRepository.findById(command.getRecipeId()).toProcessor().block();
 
         if(recipe == null){
 
@@ -107,7 +107,7 @@ public class IngredientServiceImpl implements IngredientService {
                 ingredientFound.setDescription(command.getDescription());
                 ingredientFound.setAmount(command.getAmount());
                 ingredientFound.setUom(unitOfMeasureRepository
-                        .findById(command.getUom().getId()).block());
+                        .findById(command.getUom().getId()).toProcessor().block());
 //                        .orElseThrow(() -> new RuntimeException("UOM NOT FOUND"))); //todo address this
             } else {
                 //add new Ingredient
@@ -116,7 +116,7 @@ public class IngredientServiceImpl implements IngredientService {
                 recipe.addIngredient(ingredient);
             }
 
-            Recipe savedRecipe = recipeReactiveRepository.save(recipe).block();
+            Recipe savedRecipe = recipeReactiveRepository.save(recipe).toProcessor().block();
 
             Optional<Ingredient> savedIngredientOptional = savedRecipe.getIngredients().stream()
                     .filter(recipeIngredients -> recipeIngredients.getId().equals(command.getId()))
@@ -148,7 +148,7 @@ public class IngredientServiceImpl implements IngredientService {
 
         log.debug("Deleting ingredient: " + recipeId + ":" + idToDelete);
 
-        Recipe recipe = recipeReactiveRepository.findById(recipeId).block();
+        Recipe recipe = recipeReactiveRepository.findById(recipeId).toProcessor().block();
 
         if(recipe != null) {
             log.debug("found recipe");
@@ -164,7 +164,7 @@ public class IngredientServiceImpl implements IngredientService {
                 Ingredient ingredientToDelete = ingredientOptional.get();
                // ingredientToDelete.setRecipe(null);
                 recipe.getIngredients().remove(ingredientOptional.get());
-                recipeReactiveRepository.save(recipe).block();
+                recipeReactiveRepository.save(recipe).toProcessor().block();
             }
         } else {
             log.debug("Recipe Id Not found. Id:" + recipeId);
